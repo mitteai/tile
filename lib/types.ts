@@ -30,7 +30,7 @@ export type StitchesInstance = ReturnType<typeof createStitches>;
 export type ChainMethod = (input: CSS, ...args: any[]) => CSS;
 
 export interface BaseChain {
-  extend: () => Chain;
+  extend: (newElementTag?: ElementTag) => Chain;
   compile: () => CSS;
   select: (selector: string, subchain: CSS | Chain) => Chain;
   variant: (
@@ -67,7 +67,8 @@ export type Chain = BaseChain &
   grid.Methods &
   transform.Methods &
   accessibility.Methods &
-  backdrop.Methods;
+  backdrop.Methods &
+  gradient.Methods;
 
 // Method registration helper
 export type MethodRegistrar = (name: string, method: ChainMethod) => void;

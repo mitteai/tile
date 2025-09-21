@@ -29,6 +29,7 @@ import * as responsive from "./responsive";
 import * as transform from "./transform";
 import * as accessibility from "./accessibility";
 import * as backdrop from "./backdrop";
+import * as gradient from "./gradient";
 
 const modules = [
   align,
@@ -51,6 +52,7 @@ const modules = [
   transform,
   accessibility,
   backdrop,
+  gradient,
 ];
 
 export function createChain(
@@ -94,6 +96,11 @@ export function createChain(
       value: string | number | boolean,
       subchain: Chain | CSS,
     ) => {
+      if (arguments.length === 2) {
+        subchain = value as Chain | CSS;
+        value = true;
+      }
+
       if (variants[name]) {
         variants[name].push({ chain: subchain, value });
       } else {

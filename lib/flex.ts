@@ -138,7 +138,6 @@ function applyVstack(input: CSS, options: FlexOptions = {}): CSS {
  */
 function applyCenter(input: CSS, options: FlexOptions = {}): CSS {
   return applyFlex(input, {
-    direction: "column",
     items: "center",
     justify: "center",
     ...options,

@@ -6,6 +6,7 @@ export type Methods = {
   space: (options: SpacingOptions) => Chain;
   margin: (options: number | string | BoxSides, override?: BoxSides) => Chain;
   padding: (options: number | string | BoxSides, override?: BoxSides) => Chain;
+  gap: (value: number | string) => Chain;
 };
 
 declare module "./types" {
@@ -16,6 +17,7 @@ export function register(method: MethodRegistrar) {
   method("space", applySpace);
   method("margin", applyMargin);
   method("padding", applyPadding);
+  method("gap", applyGap);
 }
 
 export interface SpacingOptions {
@@ -105,6 +107,32 @@ function applyPadding(
   return result;
 }
 
+/**
+ * Applies gap styles to the CSS object.
+ *
+ * @param css - The current CSS object
+ * @param value - Gap value for flex/grid containers
+ * @returns Updated CSS object with gap applied
+ *
+ * @example
+ * // Input:
+ * applyGap({}, 20)
+ * // Output:
+ * { gap: '20px' }
+ *
+ * @example
+ * // Input:
+ * applyGap({}, '1rem')
+ * // Output:
+ * { gap: '1rem' }
+ */
+function applyGap(css: CSS, value: number | string): CSS {
+  return {
+    ...css,
+    gap: typeof value === "number" ? `${value}px` : value,
+  };
+}
+
 function applySpacingOptions(css: CSS, options: SpacingOptions): CSS {
   const result = {
     ...css,
@@ -113,7 +141,8 @@ function applySpacingOptions(css: CSS, options: SpacingOptions): CSS {
   };
 
   if (options.gap !== undefined) {
-    result.gap = options.gap;
+    result.gap =
+      typeof options.gap === "number" ? `${options.gap}px` : options.gap;
   }
 
   return result;

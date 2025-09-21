@@ -11,7 +11,8 @@
     "build": "npm run build:js && npm run build:ts",
     "build:ts": "tsc --emitDeclarationOnly --outDir dist",
     "build:js": "esbuild lib/*.ts lib/**/*.ts --outdir=dist --target=es6 --platform=neutral --sourcemap",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "view": "node tools/view.js"
   },
   "dependencies": {
     "@stitches/react": "^1.2.8"
