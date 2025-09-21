@@ -48,7 +48,7 @@ export interface BorderOptions {
 function applyBorder(
   input: CSS,
   widthOrOptions: string | number | BorderOptions,
-  options?: BorderOptions,
+  options?: string | BorderOptions,
 ): CSS {
   let output = { ...input };
   if (typeof widthOrOptions === "object") {
@@ -56,7 +56,7 @@ function applyBorder(
   } else if (options) {
     output = applyBorderOptions(
       applyBorderOptions(output, { width: widthOrOptions }),
-      options,
+      typeof options === "string" ? { color: options } : options,
     );
   } else {
     output = applyBorderOptions(output, { width: widthOrOptions });

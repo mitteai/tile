@@ -25,9 +25,19 @@ export function register(method: MethodRegistrar) {
 
 function applyWidth(
   input: CSS,
-  width: string | number,
+  widthOrOptions:
+    | string
+    | number
+    | { max?: number | string; min?: number | string },
   options?: { max?: number | string; min?: number | string },
 ): CSS {
+  if (typeof widthOrOptions === "object") {
+    return applySizeOptions(input, {
+      maxWidth: widthOrOptions?.max,
+      minWidth: widthOrOptions?.min,
+    });
+  }
+
   return applySizeOptions(input, {
     width,
     maxWidth: options?.max,
@@ -37,9 +47,19 @@ function applyWidth(
 
 function applyHeight(
   input: CSS,
-  height: string | number,
+  heightOrOptions:
+    | string
+    | number
+    | { max?: number | string; min?: number | string },
   options?: { max?: number | string; min?: number | string },
 ): CSS {
+  if (typeof widthOrOptions === "object") {
+    return applySizeOptions(input, {
+      maxHeight: heightOrOptions?.max,
+      minHeight: heightOrOptions?.min,
+    });
+  }
+
   return applySizeOptions(input, {
     height,
     maxHeight: options?.max,
@@ -60,6 +80,11 @@ function applySize(
 
   if (typeof heightOrOptions === "object") {
     output = applySizeOptions(output, heightOrOptions);
+  }
+
+  // if only one argument is provided, use it for both width and height
+  if (arguments.length === 1) {
+    heightOrOptions = widthOrOptions;
   }
 
   if (

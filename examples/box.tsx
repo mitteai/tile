@@ -4,12 +4,15 @@ import { View, HStack, style } from "../lib";
 const Container = HStack().padding(20).gap(20).element();
 
 const Box = View()
-  .size(200, 200)
+  .size(200)
+  .width({ min: 150, max: 250 })
   .gradient("45deg", ["#ff6b6b", "#4ecdc4"])
   .round(20)
   .shadow()
   .center()
   .transition(300)
+  .border(10, "#f2f2f2")
+  .round()
   .onHover(
     View().scale(1.1).shadow({ y: 8, blur: 20, color: "rgba(0,0,0,0.3)" }),
   )
