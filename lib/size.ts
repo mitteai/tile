@@ -39,7 +39,7 @@ function applyWidth(
   }
 
   return applySizeOptions(input, {
-    width,
+    width: widthOrOptions as string | number,
     maxWidth: options?.max,
     minWidth: options?.min,
   });
@@ -53,7 +53,7 @@ function applyHeight(
     | { max?: number | string; min?: number | string },
   options?: { max?: number | string; min?: number | string },
 ): CSS {
-  if (typeof widthOrOptions === "object") {
+  if (typeof heightOrOptions === "object") {
     return applySizeOptions(input, {
       maxHeight: heightOrOptions?.max,
       minHeight: heightOrOptions?.min,
@@ -61,7 +61,7 @@ function applyHeight(
   }
 
   return applySizeOptions(input, {
-    height,
+    height: heightOrOptions as string | number,
     maxHeight: options?.max,
     minHeight: options?.min,
   });

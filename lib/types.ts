@@ -20,6 +20,7 @@ import * as responsive from "./responsive";
 import * as transform from "./transform";
 import * as accessibility from "./accessibility";
 import * as backdrop from "./backdrop";
+import * as gradient from "./gradient";
 
 export type StitchesConfig = Parameters<typeof createStitches>[0];
 export type ElementTag = Parameters<typeof stitchesStyled>[0];

@@ -97,6 +97,7 @@ export function createChain(
       subchain: Chain | CSS,
     ) => {
       if (arguments.length === 2) {
+        // @ts-ignore
         subchain = value as Chain | CSS;
         value = true;
       }

@@ -51,6 +51,7 @@ function applyBorder(
   options?: string | BorderOptions,
 ): CSS {
   let output = { ...input };
+
   if (typeof widthOrOptions === "object") {
     output = applyBorderOptions(output, widthOrOptions);
   } else if (options) {
@@ -61,7 +62,10 @@ function applyBorder(
   } else {
     output = applyBorderOptions(output, { width: widthOrOptions });
   }
+
+  // @ts-ignore
   if (options?.radius) {
+    // @ts-ignore
     output = applyRoundedCornerOptions(output, options.radius);
   }
   return output;
