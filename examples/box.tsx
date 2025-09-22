@@ -19,6 +19,7 @@ const Box = View()
   // background variants
   .variant(
     "b",
+    true,
     View().gradient("to-bottom", [
       { color: "#ff9a9e", stop: "0%" },
       { color: "#fad0c4", stop: "50%" },

@@ -96,7 +96,7 @@ export function createChain(
       value: string | number | boolean,
       subchain: Chain | CSS,
     ) => {
-      if (arguments.length === 2) {
+      if (!subchain) {
         // @ts-ignore
         subchain = value as Chain | CSS;
         value = true;
