@@ -11,6 +11,7 @@
     "build": "npm run build:js && npm run build:ts",
     "build:ts": "tsc --emitDeclarationOnly --outDir dist",
     "build:js": "esbuild lib/*.ts lib/**/*.ts --outdir=dist --target=es6 --platform=neutral --sourcemap",
+    "build:playground": "esbuild lib/index.ts --bundle --platform=browser --format=iife --global-name=Tile --outfile=playground/tile.js",
     "clean": "rm -rf dist",
     "view": "node tools/view.js"
   },

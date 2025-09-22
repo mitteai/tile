@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tile CSS Playground</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="tile.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs/loader.min.js"></script>
+  <style>
+    body, html {
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    #editor-container {
+      height: calc(100vh - 40px);
+    }
+    #preview-container {
+      height: calc(100vh - 40px);
+      background: #f8f9fa;
+      overflow: auto;
+    }
+    .header {
+      height: 40px;
+      background-color: rgba(20, 24, 31, 0.95);
+      color: rgba(255, 255, 255, 0.9);
+      border-bottom: 1px solid #e5e5e5;
+    }
+    .dropdown {
+      position: relative;
+      display: inline-block;
+      background-color: rgba(30, 34, 41, 0.95);
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: rgba(30, 34, 41, 0.95);
+      min-width: 180px;
+      box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+      z-index: 100;
+      border-radius: 4px;
+      border: 1px solid rgba(20, 24, 31, 0.95);
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+    .dropdown-item {
+      padding: 8px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    .dropdown-item:hover {
+      background-color: rgba(60, 64, 71, 0.95);
+    }
+    .error-display {
+      background: #fff5f5;
+      border: 1px solid #fed7d7;
+      border-radius: 4px;
+      padding: 16px;
+      margin: 16px;
+      color: #c53030;
+      font-family: monospace;
+      font-size: 14px;
+      white-space: pre-wrap;
+    }
+    .preview-content {
+      padding: 20px;
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body class="bg-white">
+  <header class="header flex items-center justify-between px-3" style="display: flex; align-items: center; justify-content: space-between; padding: 0 12px;">
+    <div style="width: 50%; display: flex; align-items: center; justify-content: space-between; padding: 0 12px;">
+      <div style="font-size: 12px; text-transform: uppercase; font-family: monospace; font-weight: 500; color: #9ca3af;">
+        <a href="https://github.com/your-username/tile-css" target="_blank" style="color: #f3f4f6; text-decoration: none;">
+          Tile CSS
+        </a>
+        <span style="margin: 0 8px;">v1.5.2</span>
+        <span>BY</span>
+        <a href="https://mitte.ai" target="_blank" style="color: #9ca3af; text-decoration: none; margin-left: 8px;">
+          mitte.ai
+        </a>
+      </div>
+      <div class="dropdown">
+        <button style="font-size: 12px; font-family: monospace; text-transform: uppercase; color: #9ca3af; background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+          Examples
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="dropdown-content">
+          <div class="dropdown-item" data-example="hello-world">Hello World</div>
+          <div class="dropdown-item" data-example="user-card">User Card</div>
+          <div class="dropdown-item" data-example="form">Feedback Form</div>
+          <div class="dropdown-item" data-example="gradient-boxes">Gradient Boxes</div>
+        </div>
+      </div>
+      <div>
+
+      </div>
+
+    </div>
+    <a href="https://github.com/mitteai/tile" target="_blank" style=" font-family: monospace; color: #9ca3af; text-decoration: none; margin-left: 8px;">
+      Github
+    </a>
+  </header>
+  <div style="display: flex; height: 100%;">
+    <div id="editor-container" style="width: 50%; border-right: 1px solid #e5e7eb;"></div>
+    <div id="preview-container" style="width: 50%;"></div>
+  </div>
+
+  <script>
+    // Define examples in a maintainable way
+    const examples = {
+      'hello-world': {
+        title: 'Hello World',
+        code: `
+import { Frame } from "tile-css";
+
+const Hello = Frame()
+  .size(300)
+  .center()
+  .fg("white")
+  .padding(20)
+  .mono(21, { color: "#fff" })
+  .round()
+  .gradient("45deg", ["#ff6b6b", "#4ecdc4"])
+  .element();
+
+function App() {
+  return <Hello>Hello world :)</Hello>;
+}
+
+export { App }
+`
+      },
+
+      'user-card': {
+        title: 'User Card',
+        code: `import React from "react";
+import { HStack, VStack, View, style } from "tile-css";
+
+const Container = HStack()
+  .size(350, 200)
+  .space({ gap: 20, inner: 16, outer: 24 })
+  .border(1, { color: "#eee" })
+  .round(18)
+  .shadow(0.1)
+  .align({ y: "center" })
+  .element();
+
+const ProfilePhoto = View("img")
+  .size(100)
+  .round(20)
+  .shadow()
+  .element();
+
+const User = VStack()
+  .fg("#666")
+  .sans(16, { leading: 1.25 })
+  .select("h1", style()
+    .margin(0)
+    .fg("#222")
+    .text(28, { weight: 700, tracking: -2 })
+  )
+  .element();
+
+function App() {
+  return (
+    <Container>
+      <ProfilePhoto src="https://cldup.com/JuBBlQRbI1.jpg" />
+      <User>
+        <h1>Azer Koçulu</h1>
+        Founder of Mitte
+      </User>
+    </Container>
+  );
+}
+
+export { App }
+
+`
+      },
+
+      'form': {
+        title: 'Feedback Form',
+        code: `import React from "react";
+import { Frame, VStack, HStack, View } from "tile-css";
+
+const FormContainer = Frame("90vw", "90vh")
+  .bg("white")
+  .border(1, { color: "rgba(0,0,0,0.1)" })
+  .round(20)
+  .shadow(0.2)
+  .element();
+
+const Content = VStack().padding(40).gap(20).element();
+
+const Title = Frame()
+  .text(32, { weight: "bold" })
+  .padding({ bottom: 10 })
+  .element();
+
+const Description = Frame()
+  .text(16, { color: "rgba(0,0,0,0.6)" })
+  .padding({ bottom: 20 })
+  .element();
+
+const TextArea = View("textarea")
+  .border(1, { color: "rgba(0,0,0,0.2)" })
+  .round(8)
+  .text(16)
+  .size("100%", 200)
+  .element();
+
+const SubmitButton = View("button")
+  .bg("#007bff")
+  .fg("white")
+  .padding({ y: 12 })
+  .round(8)
+  .text(16, { weight: "bold" })
+  .transition(300)
+  .onHover(View().bg("#0056b3").scale(1.02))
+  .element();
+
+function App() {
+  return (
+    <FormContainer>
+      <Content>
+
+          <Title>Feedback Form</Title>
+          <Description>
+            We'd love to hear your thoughts! Please fill out the form below.
+          </Description>
+          <TextArea placeholder="Enter your feedback here..." />
+          <SubmitButton>Submit Feedback</SubmitButton>
+
+      </Content>
+    </FormContainer>
+  );
+}
+
+export { App }
+`
+      },
+
+      'gradient-boxes': {
+        title: 'Gradient Boxes',
+        code: `import React from "react";
+import { View, HStack } from "tile-css";
+
+const Container = HStack().padding(20).gap(20).center().element();
+
+const Box = View()
+  .size(150)
+  .round(20)
+  .shadow()
+  .center()
+  .gradient("45deg", ["#ff6b6b", "#4ecdc4"])
+  .transition(300)
+  .onHover(View().scale(1.1).shadow({ y: 8, blur: 20, color: "rgba(0,0,0,0.3)" }))
+  .text(16, { weight: "bold", color: "white" })
+   // background variants
+  .variant(
+    "b",
+    true,
+    View().gradient("to-bottom", [
+      { color: "#ff9a9e", stop: "0%" },
+      { color: "#fad0c4", stop: "50%" },
+      { color: "#ff6b6b", stop: "100%" },
+    ]),
+  )
+  .variant(
+    "c",
+    View().gradient("radial", ["#667eea", "pink"], { center: "10px 10px" }),
+  )
+  .variant(
+    "d",
+    View().gradient("conic", ["#ff9a9e", "#fecfef", "#fecfef"], {
+      from: "45deg",
+    }),
+  )
+  .element();
+
+function App() {
+  return (
+    <Container>
+
+ <Box />
+      <Box b />
+      <Box c />
+      <Box d />
+    </Container>
+  );
+}
+
+export { App }
+`
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+      let editor;
+      let renderTimeout;
+      const DEBOUNCE_TIME = 800; // ms
+
+      // Initialize Monaco editor
+      require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs' }});
+      require(['vs/editor/editor.main'], function() {
+        editor = monaco.editor.create(document.getElementById('editor-container'), {
+          value: examples['hello-world'].code,
+          language: 'typescript',
+          theme: 'vs',
+          minimap: { enabled: false },
+          automaticLayout: true,
+          fontSize: 14,
+          lineHeight: 22,
+          padding: { top: 15 },
+          wordWrap: 'on',
+          scrollBeyondLastLine: false
+        });
+
+        // Auto-render on content change with debounce
+        editor.onDidChangeModelContent(function() {
+          clearTimeout(renderTimeout);
+          renderTimeout = setTimeout(renderComponent, DEBOUNCE_TIME);
+        });
+
+        // Example selector event listeners
+        document.querySelectorAll('.dropdown-item').forEach(item => {
+          item.addEventListener('click', function() {
+            const exampleKey = this.getAttribute('data-example');
+            if (examples[exampleKey]) {
+              editor.setValue(examples[exampleKey].code);
+            }
+          });
+        });
+
+        // Run initial render
+        setTimeout(renderComponent, 100);
+      });
+
+      function renderComponent() {
+        try {
+          const code = editor.getValue();
+	  const processedCode = code
+		  .replace(/import\s+React\s+from\s+["']react["'];?/g, 'const React = globalThis.React;')
+		  .replace(/import\s+\{([^}]+)\}\s+from\s+["']tile-css["'];?/g, 'const {$1} = globalThis.Tile;')
+		  .replace(/import\s+\*\s+as\s+(\w+)\s+from\s+["']tile-css["'];?/g, 'const $1 = globalThis.Tile;');
+          const previewContainer = document.getElementById('preview-container');
+
+          // Clear previous content
+          previewContainer.innerHTML = '<div class="preview-content" id="react-root"></div>';
+
+          // Transform JSX with Babel
+          const transformedCode = Babel.transform(processedCode, {
+            presets: ['react'],
+            plugins: [
+	      ['transform-modules-commonjs']
+              //['transform-modules-umd', { globals: { 'react': 'React', 'tile-css': 'Tile' } }]
+            ]
+          }).code;
+
+          // Create a module-like environment
+          const module = {
+	    exports: {}
+	  };
+
+	  const global = {}
+
+          // Execute the transformed code
+          const func = new Function("Tile", "exports", transformedCode + '\n console.log("RAN:", this, exports)');
+          const call = func(window.Tile, module.exports);
+
+          // Get the default export (component)
+          const Component = module.exports.App;
+
+          if (Component) {
+            // Render the component
+            const root = ReactDOM.createRoot(document.getElementById('react-root'));
+            root.render(React.createElement(Component));
+          } else {
+            throw new Error('No default export found. Make sure to export your component as default.');
+          }
+
+        } catch (error) {
+          console.error('Render error:', error);
+          document.getElementById('preview-container').innerHTML =
+            `<div class="error-display">Error rendering component:
+
+${error.message}
+
+Stack:
+${error.stack || 'No stack trace available'}</div>`;
+        }
+      }
+
+      // Add some basic error handling for missing globals
+      window.onerror = function(msg, url, line, col, error) {
+        console.error('Global error:', msg, error);
+        return false;
+      };
+
+      function customRequire(moduleName) {
+	switch(moduleName) {
+        case 'react':
+          return React;
+        case 'tile-css':
+          return window.Tile;
+        default:
+          throw new Error(`Module "${moduleName}" not found`);
+	}
+      }
+    });
+  </script>
+</body>
+</html>
