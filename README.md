@@ -1,8 +1,10 @@
 # Tile
 
-Chainable styling library for React. Built on top of [Stitches](https://stitches.dev).
+Chainable styling library for React.
 
 Try it and see examples:  [Tile Playground](https://mitteai.github.io/tile/)
+
+Announcement: [X](https://x.com/azerkoculu/status/1970090988862681597)
 
 ## Install
 
