@@ -77,9 +77,9 @@ function formatDuration(speed: number | string | undefined): string {
   return DEFAULT_TRANSITION_DURATION;
 }
 
-function formatDelay(delay: number | string | undefined): string | undefined {
+function formatDelay(delay: number | string | undefined): string {
   if (delay === undefined) {
-    return undefined;
+    return DEFAULT_TRANSITION_DELAY;
   }
   
   if (isValidNumber(delay)) {
@@ -163,11 +163,7 @@ function applyTransitionOptions(css: CSS, options: TransitionOptions): CSS {
   output.transitionProperty = props.join(", ");
   output.transitionTimingFunction = ease;
   output.transitionDuration = formatDuration(speed);
-  
-  const formattedDelay = formatDelay(delay);
-  if (formattedDelay !== undefined) {
-    output.transitionDelay = formattedDelay;
-  }
+  output.transitionDelay = formatDelay(delay);
 
   return output;
 }
