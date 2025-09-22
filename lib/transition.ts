@@ -12,9 +12,21 @@ declare module "./types" {
   interface ChainMethods extends Methods {}
 }
 
+type EaseValue =
+  | 'ease'
+  | 'ease-in'
+  | 'ease-out'
+  | 'ease-in-out'
+  | 'linear'
+  | 'step-start'
+  | 'step-end'
+  | `cubic-bezier(${number}, ${number}, ${number}, ${number})`
+  | `steps(${number})`
+  | `steps(${number}, ${'start' | 'end'})`;
+
 export interface TransitionOptions {
   speed?: number | string;
-  ease?: string;
+  ease?: EaseValue;
   delay?: number | string;
   props?: string[];
 }
@@ -23,9 +35,13 @@ export function register(method: MethodRegistrar) {
   method("transition", applyTransition);
 }
 
+const DEFAULT_TRANSITION_DURATION = "150ms";
+const DEFAULT_TRANSITION_EASING = "cubic-bezier(0.4, 0, 0.2, 1)";
+const DEFAULT_TRANSITION_DELAY = "0ms";
+
 const defaultTransitionProps = [
   "color",
-  "background-color",
+  "background-color", 
   "border-color",
   "text-decoration-color",
   "fill",
@@ -36,6 +52,46 @@ const defaultTransitionProps = [
   "filter",
   "backdrop-filter",
 ];
+
+function isTransitionOptions(value: unknown): value is TransitionOptions {
+  return typeof value === 'object' && value !== null;
+}
+
+function isValidNumber(value: unknown): value is number {
+  return typeof value === 'number' && !isNaN(value);
+}
+
+function formatDuration(speed: number | string | undefined): string {
+  if (speed === undefined) {
+    return DEFAULT_TRANSITION_DURATION;
+  }
+  
+  if (isValidNumber(speed)) {
+    return `${Math.max(0, speed)}ms`;
+  }
+  
+  if (typeof speed === 'string') {
+    return speed;
+  }
+  
+  return DEFAULT_TRANSITION_DURATION;
+}
+
+function formatDelay(delay: number | string | undefined): string | undefined {
+  if (delay === undefined) {
+    return undefined;
+  }
+  
+  if (isValidNumber(delay)) {
+    return `${Math.max(0, delay)}ms`;
+  }
+  
+  if (typeof delay === 'string') {
+    return delay;
+  }
+  
+  return DEFAULT_TRANSITION_DELAY;
+}
 
 /**
  * Applies transition styles to the CSS object.
@@ -84,33 +140,33 @@ function applyTransition(
   speedOrOptions?: number | string | TransitionOptions,
   props?: string[],
 ): CSS {
-  if (typeof speedOrOptions === 'object' && speedOrOptions !== null) {
-    return applyTransitionOptions(css, speedOrOptions);
-  } else {
-    return applyTransitionOptions(css, {
-      speed: speedOrOptions as number | string,
-      props: props
-    });
-  }
+  const options = isTransitionOptions(speedOrOptions)
+    ? speedOrOptions
+    : { 
+        speed: speedOrOptions, 
+        props: props
+      };
+  
+  return applyTransitionOptions(css, options);
 }
 
-function applyTransitionOptions(
-  css: CSS,
-  options?: TransitionOptions,
-): CSS {
+function applyTransitionOptions(css: CSS, options: TransitionOptions): CSS {
   const output = { ...css };
-  const { speed, ease, delay, props } = options || {};
+  
+  const {
+    speed,
+    ease = DEFAULT_TRANSITION_EASING,
+    delay,
+    props = defaultTransitionProps
+  } = options;
 
-  output.transitionProperty = (props || defaultTransitionProps).join(", ");
-  output.transitionTimingFunction = ease || "cubic-bezier(0.4, 0, 0.2, 1)";
-  output.transitionDuration = speed
-    ? typeof speed === "number"
-      ? `${speed}ms`
-      : speed
-    : "150ms";
-
-  if (delay) {
-    output.transitionDelay = typeof delay === "number" ? `${delay}ms` : delay;
+  output.transitionProperty = props.join(", ");
+  output.transitionTimingFunction = ease;
+  output.transitionDuration = formatDuration(speed);
+  
+  const formattedDelay = formatDelay(delay);
+  if (formattedDelay !== undefined) {
+    output.transitionDelay = formattedDelay;
   }
 
   return output;

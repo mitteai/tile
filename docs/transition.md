@@ -51,8 +51,8 @@ View().transition({
 When called without arguments, applies these default values:
 ```typescript
 {
-  speed: 150,           // 150ms duration
-  ease: 'cubic-bezier(0.4, 0, 0.2, 1)', // Material Design easing
+  speed: "150ms",       // 150ms duration
+  ease: "cubic-bezier(0.4, 0, 0.2, 1)", // Material Design easing
   delay: undefined,     // No delay
   props: [              // All common animatable properties
     'color', 'background-color', 'border-color', 'text-decoration-color',
@@ -62,6 +62,14 @@ When called without arguments, applies these default values:
 }
 ```
 
+#### Internal Constants
+The module uses these constants for consistent defaults:
+```typescript
+const DEFAULT_TRANSITION_DURATION = "150ms";
+const DEFAULT_TRANSITION_EASING = "cubic-bezier(0.4, 0, 0.2, 1)";
+const DEFAULT_TRANSITION_DELAY = "0ms";
+```
+
 ## TransitionOptions
 
 Interface for defining transition properties.
@@ -69,11 +77,38 @@ Interface for defining transition properties.
 ```typescript
 interface TransitionOptions {
   speed?: number | string; // Transition duration in milliseconds (number) or CSS string (e.g., '0.3s')
-  ease?: string; // CSS transition timing function (e.g., 'ease-in', 'linear', 'cubic-bezier(0.4, 0, 0.2, 1)')
+  ease?: EaseValue; // CSS transition timing function with TypeScript validation
   delay?: number | string; // Transition delay in milliseconds (number) or CSS string (e.g., '0.1s')
-  props?: string[]; // Array of CSS properties to apply the transition to (e.g., ['opacity', 'transform'])
+  props?: string[]; // Array of CSS properties as strings for maximum flexibility
 }
+
+type EaseValue = 
+  | 'ease' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'linear'
+  | 'step-start' | 'step-end'
+  | `cubic-bezier(${number}, ${number}, ${number}, ${number})`
+  | `steps(${number})`
+  | `steps(${number}, ${'start' | 'end'})`;
 ```
+
+## Internal Improvements
+
+The module includes several helper functions for robust validation and formatting:
+
+```typescript
+// Type guards for safe runtime checks
+function isTransitionOptions(value: unknown): value is TransitionOptions
+function isValidNumber(value: unknown): value is number
+
+// Formatting functions with validation and fallbacks
+function formatDuration(speed: number | string | undefined): string
+function formatDelay(delay: number | string | undefined): string | undefined
+```
+
+**Key Features:**
+- **Validation**: Checks for NaN values and invalid inputs
+- **Fallbacks**: Uses sensible defaults when invalid values are provided
+- **Optimization**: Only applies delay property when actually needed
+- **Type Safety**: Runtime type checking with TypeScript support
 
 ## Examples
 
@@ -119,3 +154,42 @@ View().transition({
 //   transitionDelay: '100ms'
 // }
 ```
+
+**Using cubic-bezier easing:**
+```typescript
+View().transition({
+  speed: 400,
+  ease: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)', // Bounce effect
+  props: ['transform', 'opacity']
+})
+```
+
+**Edge cases handled gracefully:**
+```typescript
+// Invalid values fall back to defaults
+View().transition({ speed: NaN })        // Uses 150ms default
+View().transition({ speed: -100 })       // Clamps to 0ms minimum
+View().transition({ delay: undefined })  // No delay property added
+```
+
+## Common Animatable Properties
+
+The default properties list includes the most commonly animated CSS properties:
+
+```typescript
+const defaultTransitionProps = [
+  "color",
+  "background-color", 
+  "border-color",
+  "text-decoration-color",
+  "fill",
+  "stroke",
+  "opacity",
+  "box-shadow",
+  "transform",
+  "filter",
+  "backdrop-filter",
+];
+```
+
+You can override this with any valid CSS property names in the `props` array for maximum flexibility.

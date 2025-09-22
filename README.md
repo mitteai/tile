@@ -441,3 +441,43 @@ Methods:
 * [translate(x: string | number, y?: string | number)](./docs/transform.md#translate-x-string-number-y-string-number-)
 * [skew(x: string | number, y?: string | number)](./docs/transform.md#skew-x-string-number-y-string-number-)
 * [transform(value: string)](./docs/transform.md#transform-value-string-)
+
+## [Transition](./docs/transition.md)
+
+Methods for applying CSS transitions to React components with support for both simple duration-based and advanced options-based APIs.
+
+```typescript
+import { View } from "tile-css";
+
+// Legacy API
+const SimpleAnimatedBox = View('div')
+  .size(100)
+  .bg('blue')
+  .transition(300)
+  .onHover(style().bg('red'))
+  .element();
+
+// New API - with various easing options
+const SpringBox = View('div')
+  .size(100)
+  .bg('blue')
+  .transition({
+    speed: 300,
+    ease: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)', // Spring effect
+    delay: 100,
+    props: ['background-color', 'transform']
+  })
+  .onHover(style().bg('red').scale(1.2))
+  .element();
+
+export const AnimatedComponents = ({ children }) => (
+  <>
+    <SimpleAnimatedBox>{children}</SimpleAnimatedBox>
+    <SpringBox>{children}</SpringBox>
+  </>
+);
+```
+
+Methods:
+
+* [transition(speedOrOptions?, props?)](./docs/transition.md#transitionspeedoroptions-props)
