@@ -17,11 +17,34 @@ export const CardWithSpacing = ({ children }) => (
 ```
 
 - [Shortcut Methods](#shortcut-methods)
+  - [gap](#gapvalue-number--string)
   - [margin](#marginoptions-number--string--boxsides-override-boxsides)
   - [padding](#paddingoptions-number--string--boxsides-override-boxsides)
   - [space](#spaceoptions-spacingoptions)
 
 ## Shortcut Methods
+
+### gap(value: number | string)
+
+Sets the gap between flex or grid items.
+
+```typescript
+.gap(20)        // Sets gap: 20px
+.gap('1rem')    // Sets gap: 1rem
+.gap('2em')     // Sets gap: 2em
+```
+
+Examples with flex containers:
+
+```typescript
+const HorizontalStack = HStack()
+  .gap(20)
+  .element();
+
+const VerticalStack = VStack()
+  .gap('1rem')
+  .element();
+```
 
 ### margin(options: number | string | BoxSides, override?: BoxSides)
 
@@ -67,7 +90,7 @@ Apply 10px padding on all sides except top, which gets 25px:
 .padding(10, { top: 25 })
 ```
 
-## space(options: SpacingOptions)
+### space(options: SpacingOptions)
 
 The `space` function is the primary method for applying comprehensive spacing styles.
 

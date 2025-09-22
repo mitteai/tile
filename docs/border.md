@@ -42,6 +42,14 @@ View()
   .element();
 ```
 
+Shorter way to write same code:
+
+```
+View()
+  .border(1, "black") // You can just pass color as string as options
+  .element();
+```
+
 Customizing specific sides:
 
 ```typescript
