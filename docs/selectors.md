@@ -8,7 +8,7 @@ Methods for applying styles to various element states, pseudo-elements, and cust
   - [onActive](#onactivestyles-chain--css)
   - [before](#beforestyles-chain--css)
   - [after](#afterstyles-chain--css)
-  - [attr](#attrstyles-chain--css-attributename-string-options-attrselectoroptions)
+  - [attr](#attrattributename-string-optionsorchain-attrselectoroptions--chain--css-styles-chain--css)
 
 ## Shortcut Methods
 
@@ -73,24 +73,24 @@ const AfterElement = View()
   .element();
 ```
 
-### attr(styles: Chain | CSS, attributeName: string, options?: AttrSelectorOptions)
+### attr(attributeName: string, optionsOrChain: AttrSelectorOptions | Chain | CSS, styles?: Chain | CSS)
 
 Applies styles based on attribute selectors.
 
 ```typescript
 // Simple attribute presence
 const TitledElement = View()
-  .attr(style().color('blue'), 'title')
+  .attr('title', style().color('blue'))
   .element();
 
 // Exact match
 const SpecificLink = View()
-  .attr(style().bg('red'), 'href', { eq: 'https://example.org' })
+  .attr('href', { eq: 'https://example.org' }, style().bg('red'))
   .element();
 
 // Substring match
 const DataElement = View()
-  .attr(style().bg('yellow'), 'data-value', { contains: 'example' })
+  .attr('data-value', { contains: 'example' }, style().bg('yellow'))
   .element();
 ```
 
