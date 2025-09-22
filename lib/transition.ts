@@ -2,11 +2,21 @@ import { CSS } from "@stitches/react";
 import { MethodRegistrar, Chain } from "./types";
 
 export type Methods = {
-  transition: (speed?: number | string, props?: string[]) => Chain;
+  transition: (
+    speedOrOptions?: number | string | TransitionOptions,
+    props?: string[]
+  ) => Chain;
 };
 
 declare module "./types" {
   interface ChainMethods extends Methods {}
+}
+
+export interface TransitionOptions {
+  speed?: number | string;
+  ease?: string;
+  delay?: number | string;
+  props?: string[];
 }
 
 export function register(method: MethodRegistrar) {
@@ -31,11 +41,12 @@ const defaultTransitionProps = [
  * Applies transition styles to the CSS object.
  *
  * @param css - The current CSS object
- * @param speed - Transition duration in milliseconds or as a string (e.g., '150ms', '0.15s')
- * @param props - Array of CSS properties to transition (optional)
+ * @param speedOrOptions - Transition duration (number/string) or TransitionOptions object
+ * @param props - Array of CSS properties to transition (when using legacy API)
  * @returns Updated CSS object with transition styles applied
  *
  * @example
+ * // Legacy API - simple duration
  * // Input:
  * applyTransition({}, 300)
  * // Output:
@@ -46,6 +57,7 @@ const defaultTransitionProps = [
  * }
  *
  * @example
+ * // Legacy API - duration with specific properties
  * // Input:
  * applyTransition({}, '0.5s', ['opacity', 'transform'])
  * // Output:
@@ -54,29 +66,52 @@ const defaultTransitionProps = [
  *   transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
  *   transitionDuration: '0.5s'
  * }
+ *
+ * @example
+ * // New API - options object
+ * // Input:
+ * applyTransition({}, { speed: 300, ease: 'ease-in', delay: 100, props: ['opacity'] })
+ * // Output:
+ * {
+ *   transitionProperty: 'opacity',
+ *   transitionTimingFunction: 'ease-in',
+ *   transitionDuration: '300ms',
+ *   transitionDelay: '100ms'
+ * }
  */
 function applyTransition(
   css: CSS,
-  speed?: number | string,
+  speedOrOptions?: number | string | TransitionOptions,
   props?: string[],
 ): CSS {
-  return applyTransitionOptions(css, speed, props);
+  if (typeof speedOrOptions === 'object' && speedOrOptions !== null) {
+    return applyTransitionOptions(css, speedOrOptions);
+  } else {
+    return applyTransitionOptions(css, {
+      speed: speedOrOptions as number | string,
+      props: props
+    });
+  }
 }
 
 function applyTransitionOptions(
   css: CSS,
-  speed?: number | string,
-  props?: string[],
+  options?: TransitionOptions,
 ): CSS {
   const output = { ...css };
+  const { speed, ease, delay, props } = options || {};
 
   output.transitionProperty = (props || defaultTransitionProps).join(", ");
-  output.transitionTimingFunction = "cubic-bezier(0.4, 0, 0.2, 1)";
+  output.transitionTimingFunction = ease || "cubic-bezier(0.4, 0, 0.2, 1)";
   output.transitionDuration = speed
     ? typeof speed === "number"
       ? `${speed}ms`
       : speed
     : "150ms";
+
+  if (delay) {
+    output.transitionDelay = typeof delay === "number" ? `${delay}ms` : delay;
+  }
 
   return output;
 }
