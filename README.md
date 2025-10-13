@@ -476,3 +476,27 @@ function App() {
 
 export { App }
 ```
+
+## [Additional]()
+
+if you chain a method that isn’t provided by a built-in module, it’s treated as a **CSS property** (camelCased) or a 
+**Stitches util** key and merged into the style tree. This lets you use one-off properties without writing a new module.
+
+```typescript
+
+import { View } from "tile-css";
+
+const Avatar = View("img")
+  .size(200)
+  .border("1px solid #000")
+  .round(12)
+  .objectFit('fill') // This doesn't exist in the first-class chain methods
+  .objectPosition('20% 20%') // This doesn't exist in the first-class chain methods
+  .element();
+
+function App() {
+  return <Avatar src="https://picsum.photos/100/100" alt="avatar" />
+}
+
+export { App }
+```
