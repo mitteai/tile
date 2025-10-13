@@ -68,6 +68,8 @@ export function createChain(
   const variants: VariantCSS = { ...startingValues?.variants };
   const children: Record<string, CSS | Chain> = { ...startingValues?.children };
 
+  let self: Chain;
+
   const chain: Chain = {
     extend: (newElementTag?: Tag) => {
       return createChain(stitches, newElementTag || elementTag, {
@@ -80,7 +82,7 @@ export function createChain(
     // @ts-ignore
     select: (selector: string, subchain: CSS | Chain) => {
       children[selector] = subchain;
-      return chain;
+      return self;
     },
     // In your element method:
     element: (rawCSS?: CSS) => {
@@ -112,23 +114,49 @@ export function createChain(
           },
         ];
       }
-
-      return chain;
+      return self;
     },
+
     css: (rawCSS: CSS) => {
       update(rawCSS);
-      return chain;
+      return self;
     },
   };
 
   modules.forEach((m) => m.register(addMethod));
 
-  return chain;
+  const proxy = new Proxy(chain as Chain, {
+    get(target, propKey, receiver) {
+      // Default implemented methods
+      if (propKey in target) {
+        return Reflect.get(target, propKey, receiver);
+      }
+
+      if (typeof propKey !== "string") {
+        return undefined;
+      }
+
+      return (...args: any[]) => {
+        if (!args.length) {
+          return receiver;
+        }
+
+        // Fallback to style property update with given key-value pairs.
+        update({ [propKey]: args[0] });
+
+        return receiver;
+      };
+    },
+  });
+
+  self = proxy as Chain;
+
+  return proxy as Chain;
 
   function addMethod(name: string, fn: ChainMethod) {
     chain[name] = (...args: unknown[]) => {
       update(fn.apply(chain, [tree, ...args]));
-      return chain;
+      return self;
     };
   }
 
@@ -157,7 +185,7 @@ export function createChain(
     for (const selector in children) {
       output[selector] =
         typeof children[selector].compile === "function"
-          ? children[selector].compile()
+          ? (children[selector] as Chain).compile()
           : children[selector];
     }
 

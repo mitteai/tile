@@ -30,9 +30,9 @@ var Tile = (() => {
   ));
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // node_modules/.deno/react@18.3.1/node_modules/react/cjs/react.development.js
+  // node_modules/react/cjs/react.development.js
   var require_react_development = __commonJS({
-    "node_modules/.deno/react@18.3.1/node_modules/react/cjs/react.development.js"(exports, module) {
+    "node_modules/react/cjs/react.development.js"(exports, module) {
       "use strict";
       if (true) {
         (function() {
@@ -1904,9 +1904,9 @@ var Tile = (() => {
     }
   });
 
-  // node_modules/.deno/react@18.3.1/node_modules/react/index.js
+  // node_modules/react/index.js
   var require_react = __commonJS({
-    "node_modules/.deno/react@18.3.1/node_modules/react/index.js"(exports, module) {
+    "node_modules/react/index.js"(exports, module) {
       "use strict";
       if (false) {
         module.exports = null;
@@ -1931,7 +1931,7 @@ var Tile = (() => {
     style: () => style
   });
 
-  // node_modules/.deno/@stitches+react@1.2.8/node_modules/@stitches/react/dist/index.mjs
+  // node_modules/@stitches/react/dist/index.mjs
   var import_react = __toESM(require_react(), 1);
   var e = "colors";
   var t = "sizes";
@@ -3802,6 +3802,7 @@ var Tile = (() => {
     let tree = { ...startingValues?.tree };
     const variants = { ...startingValues?.variants };
     const children = { ...startingValues?.children };
+    let self;
     const chain = {
       extend: (newElementTag) => {
         return createChain(stitches, newElementTag || elementTag, {
@@ -3814,7 +3815,7 @@ var Tile = (() => {
       // @ts-ignore
       select: (selector, subchain) => {
         children[selector] = subchain;
-        return chain;
+        return self;
       },
       // In your element method:
       element: (rawCSS) => {
@@ -3839,19 +3840,37 @@ var Tile = (() => {
             }
           ];
         }
-        return chain;
+        return self;
       },
       css: (rawCSS) => {
         update(rawCSS);
-        return chain;
+        return self;
       }
     };
     modules.forEach((m2) => m2.register(addMethod));
-    return chain;
+    const proxy = new Proxy(chain, {
+      get(target, propKey, receiver) {
+        if (propKey in target) {
+          return Reflect.get(target, propKey, receiver);
+        }
+        if (typeof propKey !== "string") {
+          return void 0;
+        }
+        return (...args) => {
+          if (!args.length) {
+            return receiver;
+          }
+          update({ [propKey]: args[0] });
+          return receiver;
+        };
+      }
+    });
+    self = proxy;
+    return proxy;
     function addMethod(name, fn) {
       chain[name] = (...args) => {
         update(fn.apply(chain, [tree, ...args]));
-        return chain;
+        return self;
       };
     }
     function update(updates) {
