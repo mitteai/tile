@@ -441,3 +441,38 @@ Methods:
 * [translate(x: string | number, y?: string | number)](./docs/transform.md#translate-x-string-number-y-string-number-)
 * [skew(x: string | number, y?: string | number)](./docs/transform.md#skew-x-string-number-y-string-number-)
 * [transform(value: string)](./docs/transform.md#transform-value-string-)
+
+## [CSS]()
+
+Method for injecting arbitrary Stitches CSS into the current chain.
+Use this when you need a style that isn’t (yet) covered by the first-class chain methods,
+or when you want to author nested selectors and media queries inline.
+
+```typescript
+
+import { Frame } from "tile-css";
+
+const Hello = Frame()
+  .size(300)
+  .fg("white")
+  .mono(21, { color: "#000" })
+  .css({
+    border: "1px solid #000",
+    boxShadow: "0 10px 24px rgba(0,0,0,.18)",
+    textAlign: "center",
+  })
+  .css({
+    "@media (max-width: 480px)": {
+      width: 240,
+      height: 240,
+      fontSize: 14,
+    },
+  })
+  .element();
+
+function App() {
+  return <Hello>Hello world :)</Hello>;
+}
+
+export { App }
+```
