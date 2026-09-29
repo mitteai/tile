@@ -1,7 +1,7 @@
 name: ci
 
-# No test suite yet; every PR runs the build, which includes the TypeScript
-# type check (tsc --emitDeclarationOnly).
+# Every PR runs the build, which includes the TypeScript type check
+# (tsc --emitDeclarationOnly), and the playground tests.
 on:
   pull_request:
   push:
@@ -26,3 +26,5 @@ jobs:
       - run: npm ci
 
       - run: npm run build
+
+      - run: npm test
