@@ -1,11 +1,15 @@
 name: ci
 
-# No test suite yet; every PR runs the build, which includes the TypeScript
-# type check (tsc --emitDeclarationOnly).
+# Every PR runs the build, which includes the TypeScript type check
+# (tsc --emitDeclarationOnly), and the playground tests.
 on:
   pull_request:
   push:
     branches: [main]
+
+# The job only reads the repo; the token gets nothing more.
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -22,3 +26,5 @@ jobs:
       - run: npm ci
 
       - run: npm run build
+
+      - run: npm test
