@@ -16,6 +16,13 @@ if (!exampleFile) {
 // Resolve the full path
 const fullPath = path.resolve(exampleFile);
 
+// Restrict access to the examples directory only
+const examplesDir = path.resolve(__dirname, "..", "examples");
+if (!fullPath.startsWith(examplesDir + path.sep)) {
+  console.error(`Error: File must be within the examples/ directory`);
+  process.exit(1);
+}
+
 if (!fs.existsSync(fullPath)) {
   console.error(`File not found: ${fullPath}`);
   process.exit(1);
@@ -146,20 +153,16 @@ async function buildAndServe() {
     console.log("Build successful!");
 
     // Create a simple HTTP server
+    // Pre-build allowed paths to avoid any user-input in path construction
+    const servedFiles = {
+      "/": path.join(tempDir, "index.html"),
+      "/bundle.js": path.join(tempDir, "bundle.js"),
+      "/bundle.js.map": path.join(tempDir, "bundle.js.map"),
+    };
     const server = http.createServer((req, res) => {
-      let filePath = path.join(
-        tempDir,
-        req.url === "/" ? "index.html" : req.url,
-      );
+      const filePath = servedFiles[req.url];
 
-      // Security: prevent directory traversal
-      if (!filePath.startsWith(tempDir)) {
-        res.writeHead(403);
-        res.end("Forbidden");
-        return;
-      }
-
-      if (!fs.existsSync(filePath)) {
+      if (!filePath || !fs.existsSync(filePath)) {
         res.writeHead(404);
         res.end("Not found");
         return;
